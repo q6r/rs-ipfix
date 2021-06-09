@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    extern crate ipfix;
+    extern crate rsipfix;
 
-    use self::ipfix::{IpfixParser, DataRecordKey, DataRecordValue};
+    use self::rsipfix::{IpfixParser, DataRecordKey, DataRecordValue};
     use std::net::Ipv4Addr;
 
     #[test]
@@ -119,8 +119,8 @@ mod tests {
         assert!(msg.sets.len() == 1);
         assert!(parser.parse_message(&template_bytes).is_ok());
         
-        let ipfixhdr = parser.parse_message(&data_bytes).unwrap();
-        let datarecords = ipfixhdr.get_dataset_records();
+        let rsipfixhdr = parser.parse_message(&data_bytes).unwrap();
+        let datarecords = rsipfixhdr.get_dataset_records();
         for datarecord in &datarecords {
             let _json = datarecord.to_json().unwrap();
         }
@@ -171,45 +171,45 @@ mod tests {
         let mut parser = IpfixParser::new();
 
         // add custom fields for ntop pen
-        parser.add_custom_field(35632, 205, "DNS_QUERY", ipfix::be_string);
-        parser.add_custom_field(35632, 206, "DNS_QUERY_ID", ipfix::be_string);
-        parser.add_custom_field(35632, 207, "DNS_QUERY_TYPE", ipfix::be_string);
-        parser.add_custom_field(35632, 208, "DNS_RET_CODE", ipfix::be_string);
-        parser.add_custom_field(35632, 209, "DNS_NUM_ANSWERS", ipfix::be_string);
-        parser.add_custom_field(35632, 352, "DNS_TTL_ANSWER", ipfix::be_string);
-        parser.add_custom_field(35632, 398, "DNS_RESPONSE", ipfix::be_string);
-        parser.add_custom_field(35632, 180, "HTTP_URL", ipfix::be_string);
-        parser.add_custom_field(35632, 360, "HTTP_METHOD", ipfix::be_string);
-        parser.add_custom_field(35632, 181, "HTTP_RET_CODE", ipfix::be_string);
-        parser.add_custom_field(35632, 182, "HTTP_REFERER", ipfix::be_string);
-        parser.add_custom_field(35632, 183, "HTTP_UA", ipfix::be_string);
-        parser.add_custom_field(35632, 184, "HTTP_MIME", ipfix::be_string);
-        parser.add_custom_field(35632, 187, "HTTP_HOST", ipfix::be_string);
-        parser.add_custom_field(35632, 361, "HTTP_SITE", ipfix::be_string);
-        parser.add_custom_field(35632, 460, "HTTP_X_FORWARDED_FOR", ipfix::be_string);
-        parser.add_custom_field(35632, 461, "HTTP_VIA", ipfix::be_string);
-        parser.add_custom_field(35632, 81, "DST_FRAGMENTS", ipfix::be_string);
-        parser.add_custom_field(35632, 123, "CLIENT_NW_LATENCY_MS", ipfix::be_string);
-        parser.add_custom_field(35632, 124, "SERVER_NW_LATENCY_MS", ipfix::be_string);
-        parser.add_custom_field(35632, 79, "SERVER_TCP_FLAGS", ipfix::be_string);
-        parser.add_custom_field(35632, 110, "RETRANSMITTED_OUT_PKTS", ipfix::be_string);
-        parser.add_custom_field(35632, 111, "OOORDER_IN_PKTS", ipfix::be_string);
-        parser.add_custom_field(35632, 188, "TLS_SERVER_NAME", ipfix::be_string);
-        parser.add_custom_field(35632, 189, "BITTORRENT_HASH", ipfix::be_string);
-        parser.add_custom_field(35632, 416, "TCP_WIN_MAX_IN", ipfix::be_string);
-        parser.add_custom_field(35632, 80, "SRC_FRAGMENTS", ipfix::be_string);
-        parser.add_custom_field(35632, 78, "CLIENT_TCP_FLAGS", ipfix::be_string);
-        parser.add_custom_field(35632, 125, "APPL_LATENCY_MS", ipfix::be_string);
-        parser.add_custom_field(35632, 109, "RETRANSMITTED_IN_PKTS", ipfix::be_string);
-        parser.add_custom_field(35632, 420, "TCP_WIN_MAX_OUT", ipfix::be_string);
-        parser.add_custom_field(35632, 509, "L7_PROTO_RISK", ipfix::be_string);
-        parser.add_custom_field(35632, 527, "L7_RISK_SCORE", ipfix::be_string);
-        parser.add_custom_field(35632, 278, "GTPV2_APN_NAME", ipfix::be_string);
-        parser.add_custom_field(35632, 280, "GTPV2_ULI_MNC", ipfix::be_string);
-        parser.add_custom_field(35632, 180, "HTTP_URL", ipfix::be_string);
-        parser.add_custom_field(35632, 380, "RTP_RTT", ipfix::be_string);
-        parser.add_custom_field(35632, 112, "OOORDER_OUT_PKTS", ipfix::be_string);
-        parser.add_custom_field(35632, 118, "L7_PROTO", ipfix::be_string);
+        parser.add_custom_field(35632, 205, "DNS_QUERY", rsipfix::be_string);
+        parser.add_custom_field(35632, 206, "DNS_QUERY_ID", rsipfix::be_string);
+        parser.add_custom_field(35632, 207, "DNS_QUERY_TYPE", rsipfix::be_string);
+        parser.add_custom_field(35632, 208, "DNS_RET_CODE", rsipfix::be_string);
+        parser.add_custom_field(35632, 209, "DNS_NUM_ANSWERS", rsipfix::be_string);
+        parser.add_custom_field(35632, 352, "DNS_TTL_ANSWER", rsipfix::be_string);
+        parser.add_custom_field(35632, 398, "DNS_RESPONSE", rsipfix::be_string);
+        parser.add_custom_field(35632, 180, "HTTP_URL", rsipfix::be_string);
+        parser.add_custom_field(35632, 360, "HTTP_METHOD", rsipfix::be_string);
+        parser.add_custom_field(35632, 181, "HTTP_RET_CODE", rsipfix::be_string);
+        parser.add_custom_field(35632, 182, "HTTP_REFERER", rsipfix::be_string);
+        parser.add_custom_field(35632, 183, "HTTP_UA", rsipfix::be_string);
+        parser.add_custom_field(35632, 184, "HTTP_MIME", rsipfix::be_string);
+        parser.add_custom_field(35632, 187, "HTTP_HOST", rsipfix::be_string);
+        parser.add_custom_field(35632, 361, "HTTP_SITE", rsipfix::be_string);
+        parser.add_custom_field(35632, 460, "HTTP_X_FORWARDED_FOR", rsipfix::be_string);
+        parser.add_custom_field(35632, 461, "HTTP_VIA", rsipfix::be_string);
+        parser.add_custom_field(35632, 81, "DST_FRAGMENTS", rsipfix::be_string);
+        parser.add_custom_field(35632, 123, "CLIENT_NW_LATENCY_MS", rsipfix::be_string);
+        parser.add_custom_field(35632, 124, "SERVER_NW_LATENCY_MS", rsipfix::be_string);
+        parser.add_custom_field(35632, 79, "SERVER_TCP_FLAGS", rsipfix::be_string);
+        parser.add_custom_field(35632, 110, "RETRANSMITTED_OUT_PKTS", rsipfix::be_string);
+        parser.add_custom_field(35632, 111, "OOORDER_IN_PKTS", rsipfix::be_string);
+        parser.add_custom_field(35632, 188, "TLS_SERVER_NAME", rsipfix::be_string);
+        parser.add_custom_field(35632, 189, "BITTORRENT_HASH", rsipfix::be_string);
+        parser.add_custom_field(35632, 416, "TCP_WIN_MAX_IN", rsipfix::be_string);
+        parser.add_custom_field(35632, 80, "SRC_FRAGMENTS", rsipfix::be_string);
+        parser.add_custom_field(35632, 78, "CLIENT_TCP_FLAGS", rsipfix::be_string);
+        parser.add_custom_field(35632, 125, "APPL_LATENCY_MS", rsipfix::be_string);
+        parser.add_custom_field(35632, 109, "RETRANSMITTED_IN_PKTS", rsipfix::be_string);
+        parser.add_custom_field(35632, 420, "TCP_WIN_MAX_OUT", rsipfix::be_string);
+        parser.add_custom_field(35632, 509, "L7_PROTO_RISK", rsipfix::be_string);
+        parser.add_custom_field(35632, 527, "L7_RISK_SCORE", rsipfix::be_string);
+        parser.add_custom_field(35632, 278, "GTPV2_APN_NAME", rsipfix::be_string);
+        parser.add_custom_field(35632, 280, "GTPV2_ULI_MNC", rsipfix::be_string);
+        parser.add_custom_field(35632, 180, "HTTP_URL", rsipfix::be_string);
+        parser.add_custom_field(35632, 380, "RTP_RTT", rsipfix::be_string);
+        parser.add_custom_field(35632, 112, "OOORDER_OUT_PKTS", rsipfix::be_string);
+        parser.add_custom_field(35632, 118, "L7_PROTO", rsipfix::be_string);
         
         let _ = parser.parse_message(&temp_1);
         let _ = parser.parse_message(&temp_2);

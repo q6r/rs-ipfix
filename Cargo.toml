@@ -1,11 +1,12 @@
 [package]
-name = "ipfix"
-version = "0.1.1"
-authors = ["Nick Price <nick@spun.io>"]
-description = "IPFIX (RFC7011) parser library with JSON export, based on nom"
-homepage = "https://github.com/dominotree/rs-ipfix"
-repository = "https://github.com/dominotree/rs-ipfix"
+name = "rsipfix"
+version = "0.1.2"
+authors = ["Essa Alkuwari <qnix@0x80.org>"]
+description = "IPFIX parser library"
+homepage = "https://github.com/q6r/rs-ipfix"
+repository = "https://github.com/q6r/rs-ipfix"
 license = "MIT"
+readme = "readme.md"
 
 [dependencies]
 nom-derive = "0.8.0"

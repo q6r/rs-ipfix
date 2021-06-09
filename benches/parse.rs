@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate bencher;
-extern crate ipfix;
+extern crate rsipfix;
 
 use bencher::{Bencher, black_box};
-use ipfix::IpfixParser;
+use rsipfix::IpfixParser;
 
 fn parse_data(bench: &mut Bencher) {
 
