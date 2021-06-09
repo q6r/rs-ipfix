@@ -3,7 +3,7 @@
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Crates.io Version](https://img.shields.io/crates/v/rsipfix.svg)](https://crates.io/crates/rsipfix)
 
-This is a library to parse IPFIX/Netflow v10 (RFC7011).
+This is a library to parse IPFIX/Netflow v10 (RFC7011) (fork from rs-ipfix).
 
 Features :
 
