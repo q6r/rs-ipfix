@@ -1,54 +1,48 @@
 extern crate nom;
 
-use std::collections::HashMap;
 use nom::number::complete::{be_u128, be_u16, be_u32, be_u64};
-use crate::{DataRecordValue};
+use parser;
+use std::collections::HashMap;
 
 #[inline]
-pub fn be_int(s: &[u8]) -> DataRecordValue {
+pub fn be_int(s: &[u8]) -> parser::DataRecordValue {
     match s.len() {
-        1 => DataRecordValue::U8(s[0]),
-        2 => {
-            match read_u16(s).ok() {
-                Some((_, val)) => DataRecordValue::U16(val),
-                None => DataRecordValue::Bytes(s)
-            }
+        1 => parser::DataRecordValue::U8(s[0]),
+        2 => match read_u16(s).ok() {
+            Some((_, val)) => parser::DataRecordValue::U16(val),
+            None => parser::DataRecordValue::Bytes(s),
         },
-        4 => {
-            match read_u32(s).ok() {
-                Some((_, val)) => DataRecordValue::U32(val),
-                None => DataRecordValue::Bytes(s)
-            }
+        4 => match read_u32(s).ok() {
+            Some((_, val)) => parser::DataRecordValue::U32(val),
+            None => parser::DataRecordValue::Bytes(s),
         },
-        8 => {
-            match read_u64(s).ok() {
-                Some((_, val)) => DataRecordValue::U64(val),
-                None => DataRecordValue::Bytes(s)
-            }
+        8 => match read_u64(s).ok() {
+            Some((_, val)) => parser::DataRecordValue::U64(val),
+            None => parser::DataRecordValue::Bytes(s),
         },
-        _ => DataRecordValue::Bytes(s),
+        _ => parser::DataRecordValue::Bytes(s),
     }
 }
 
 #[inline]
-pub fn ipv4_addr(s: &[u8]) -> DataRecordValue {
-     match read_u32(s).ok() {
-         Some((_, ipv4)) => DataRecordValue::IPv4(ipv4.into()),
-         None => DataRecordValue::Bytes(s)
-     }
+pub fn ipv4_addr(s: &[u8]) -> parser::DataRecordValue {
+    match read_u32(s).ok() {
+        Some((_, ipv4)) => parser::DataRecordValue::IPv4(ipv4.into()),
+        None => parser::DataRecordValue::Bytes(s),
+    }
 }
 
 #[inline]
-pub fn ipv6_addr(s: &[u8]) -> DataRecordValue {
+pub fn ipv6_addr(s: &[u8]) -> parser::DataRecordValue {
     match read_u128(s).ok() {
-        Some((_, ipv6)) => DataRecordValue::IPv6(ipv6.into()),
-        None => DataRecordValue::Bytes(s)
+        Some((_, ipv6)) => parser::DataRecordValue::IPv6(ipv6.into()),
+        None => parser::DataRecordValue::Bytes(s),
     }
 }
 
 #[inline]
-pub fn be_string(s: &[u8]) -> DataRecordValue {
-    DataRecordValue::String(String::from_utf8_lossy(s).to_string())
+pub fn be_string(s: &[u8]) -> parser::DataRecordValue {
+    parser::DataRecordValue::String(String::from_utf8_lossy(s).to_string())
 }
 
 #[inline]
@@ -61,7 +55,7 @@ named!(read_u64<u64>, call!(be_u64));
 named!(read_u128<u128>, call!(be_u128));
 
 #[inline]
-fn mpls_stack(s: &[u8]) -> DataRecordValue {
+fn mpls_stack(s: &[u8]) -> parser::DataRecordValue {
     //      0                   1                   2
     //  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
     // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -81,20 +75,17 @@ fn mpls_stack(s: &[u8]) -> DataRecordValue {
     ));
 
     match parse_mpls_stack(s) {
-        Ok((_, (label, exp, bottom))) => {
-            DataRecordValue::MPLS(label, exp, bottom)
-        },
-        Err(err) => {
-            DataRecordValue::Err(format!("{}", err), s)
-        }
+        Ok((_, (label, exp, bottom))) => parser::DataRecordValue::MPLS(label, exp, bottom),
+        Err(err) => parser::DataRecordValue::Err(format!("{}", err), s),
     }
 }
 
 // field_id -> parser
-pub type FieldFormatter = HashMap<u16, (&'static str, fn(&[u8]) -> DataRecordValue)>;
+pub type FieldFormatter = HashMap<u16, (&'static str, fn(&[u8]) -> parser::DataRecordValue)>;
 // enterprise_number -> FieldFormatters
 pub type EnterpriseFormatter = HashMap<u32, FieldFormatter>;
 
+/// Fieldparser create a map of field parser
 #[macro_export]
 macro_rules! field_parser(
     { $($key:expr => ($string:expr, $value:expr)),+ } => {
@@ -110,7 +101,7 @@ macro_rules! field_parser(
 
 // default field_parsers for enterprise number 0
 pub fn get_default_parsers() -> FieldFormatter {
-    field_parser!{
+    field_parser! {
         1 => ("octetDeltaCount", be_int),
         2 => ("packetDeltaCount", be_int),
         4 => ("protocolIdentifier", be_int),
