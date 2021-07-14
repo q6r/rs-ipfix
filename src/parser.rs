@@ -47,6 +47,7 @@ pub struct SetHeader {
     pub set_id: u16, // 2: Template Set, 3: Options Template Set, >255: Data Set
     pub length: u16,
 }
+
 #[derive(Debug)]
 pub struct TemplateSet {
     #[allow(dead_code)]
@@ -59,6 +60,7 @@ pub struct TemplateHeader {
     pub template_id: u16,
     pub field_count: u16,
 }
+
 #[derive(Nom, Debug)]
 pub struct Template {
     pub header: TemplateHeader,
@@ -164,7 +166,7 @@ impl From<u16> for SetType {
 }
 
 impl<'a> DataRecord<'a> {
-    // json serialize the DataRecord
+    /// json serialize the DataRecord
     pub fn to_json(&self) -> serde_json::Result<String> {
         serde_json::to_string(&self)
     }
@@ -339,8 +341,8 @@ impl<'a> DataSet<'a> {
 }
 
 impl<'a> Message<'a> {
-    // get the records from the a set of type DataSet
-    // if none exists an empty vector is returned.
+    /// get the records from the a set of type DataSet
+    /// if none exists an empty vector is returned.
     pub fn get_dataset_records(&self) -> Vec<&DataRecord> {
         self.sets
             .iter()
@@ -354,7 +356,7 @@ impl<'a> Message<'a> {
 }
 
 impl<'a> Set<'a> {
-    // TODO : proper errors
+    /// parse a set from the input
     pub fn parse(input: &[u8]) -> nom::IResult<&[u8], Set> {
         let (body, hdr) = SetHeader::parse(input)?;
 
@@ -443,6 +445,7 @@ impl<'a> Set<'a> {
 }
 
 impl Parser {
+    /// create a new parser
     pub fn new() -> Self {
         let mut enterprise_formatters = HashMap::new();
         enterprise_formatters.insert(0, printer::get_default_parsers());
@@ -451,6 +454,7 @@ impl Parser {
         }
     }
 
+    /// add custom fields for formatting to support custom fields
     pub fn add_custom_field(
         &mut self,
         enterprise_number: u32,
@@ -465,6 +469,7 @@ impl Parser {
         m.insert(field_id, (name, parser));
     }
 
+    /// parse an IPFIX message
     pub fn parse_message<'a>(
         &'a mut self,
         state: &mut state::State,

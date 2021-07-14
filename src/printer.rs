@@ -99,7 +99,7 @@ macro_rules! field_parser(
     };
 );
 
-// default field_parsers for enterprise number 0
+/// default field_parsers for enterprise number 0
 pub fn get_default_parsers() -> FieldFormatter {
     field_parser! {
         1 => ("octetDeltaCount", be_int),
