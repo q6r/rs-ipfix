@@ -8,6 +8,7 @@ use state;
 use std::{
     collections::HashMap,
     net::{Ipv4Addr, Ipv6Addr},
+    sync::{Arc, RwLock},
 };
 
 pub struct Parser {
@@ -435,6 +436,56 @@ impl<'a> Set<'a> {
         }
     }
 
+    // similar to `process_set_body` except used with thread-friendly state that is
+    // efficient in the type of locks used R/W depending on set content.
+    fn process_set_body_async(
+        &mut self,
+        fmts: &printer::EnterpriseFormatter,
+        state: Arc<RwLock<state::State>>,
+    ) -> Result<()> {
+        match self.stype {
+            SetType::DataSet => {
+                let s = state
+                    .read()
+                    .map_err(|e| anyhow!("failed to obtain read lock on state : {}", e))?;
+
+                let (_, ds) = DataSet::parse(
+                    self.buf,
+                    self.length().unwrap_or(0) as u16,
+                    self.hdr.set_id,
+                    fmts,
+                    &s,
+                )
+                .map_err(|e| anyhow!("failed parsing dataset : {}", e))?;
+
+                self.data.push(ds);
+                Ok(())
+            }
+            SetType::OptionTemplate => {
+                let (_, tv) = OptionsTemplate::parse_many(self.buf)
+                    .map_err(|e| anyhow!("failed parsing options templates : {}", e))?;
+                let mut s = state
+                    .write()
+                    .map_err(|e| anyhow!("failed to obtain read lock on state : {}", e))?;
+                for ts in tv {
+                    s.add_options_template(ts.header.id, ts);
+                }
+                Ok(())
+            }
+            SetType::Template => {
+                let (_, tv) = Template::parse_many(self.buf)
+                    .map_err(|e| anyhow!("failed parsing templates : {}", e))?;
+                let mut s = state
+                    .write()
+                    .map_err(|e| anyhow!("failed to obtain write lock on state : {}", e))?;
+                for ts in tv {
+                    s.add_template(ts.header.template_id, ts);
+                }
+                Ok(())
+            }
+        }
+    }
+
     fn length(&self) -> Option<usize> {
         if self.hdr.length < 4 {
             None
@@ -467,6 +518,36 @@ impl Parser {
             .entry(enterprise_number)
             .or_insert_with(HashMap::new);
         m.insert(field_id, (name, parser));
+    }
+
+    /// similar to `parse_message` except it takes a thread-safe state
+    /// can be used for concurrent processing.
+    pub fn parse_message_async<'a>(
+        &'a mut self,
+        state: Arc<RwLock<state::State>>,
+        input: &'a [u8],
+    ) -> Result<Message> {
+        // this should be 1:1 with UDP datagrams
+        // we aren't currently using any of the data from the ipfix message header but we still
+        // need to chop it off
+        let (body, mut parsed) = Message::parse(input)
+            .map_err(|e| anyhow!("failed while parsing ipfix header : {:?}", e))?;
+
+        let (_, sets) =
+            Set::parse_many(&body).map_err(|e| anyhow!("failed while extracting sets {:?}", e))?;
+        parsed.sets = sets;
+
+        // parse sets with async state updates
+        for set in &mut parsed.sets {
+            match set.process_set_body_async(&self.pen_formatter, state.clone()) {
+                Ok(()) => {}
+                Err(_err) => {
+                    // TODO : handle
+                }
+            }
+        }
+
+        Ok(parsed)
     }
 
     /// parse an IPFIX message
