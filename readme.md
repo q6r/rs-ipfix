@@ -11,5 +11,6 @@ Features :
 - Can parse variable size fields
 - Minimal memory usage
 - JSON output
+- Concurrent parsing (with thread-safe state handling)
 
 See `./tests` for usage.
