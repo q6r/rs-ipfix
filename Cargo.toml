@@ -1,6 +1,6 @@
 [package]
 name = "rsipfix"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Essa Alkuwari <qnix@0x80.org>"]
 description = "IPFIX parser library"
 homepage = "https://github.com/q6r/rs-ipfix"
