@@ -4,6 +4,7 @@ use nom::number::complete::{be_u128, be_u16, be_u32, be_u64};
 use parser;
 use std::collections::HashMap;
 
+/// conversion of array of bytes to various DataRecordValues
 #[inline]
 pub fn be_int(s: &[u8]) -> parser::DataRecordValue {
     match s.len() {
@@ -24,6 +25,7 @@ pub fn be_int(s: &[u8]) -> parser::DataRecordValue {
     }
 }
 
+/// conversion of bytes array to a DataRecordValue ipv4
 #[inline]
 pub fn ipv4_addr(s: &[u8]) -> parser::DataRecordValue {
     match read_u32(s).ok() {
@@ -32,6 +34,7 @@ pub fn ipv4_addr(s: &[u8]) -> parser::DataRecordValue {
     }
 }
 
+/// conversion of bytes array to a DataRecordValue ipv6
 #[inline]
 pub fn ipv6_addr(s: &[u8]) -> parser::DataRecordValue {
     match read_u128(s).ok() {
@@ -40,6 +43,7 @@ pub fn ipv6_addr(s: &[u8]) -> parser::DataRecordValue {
     }
 }
 
+/// conversion of bytes to a DataRecordValue string
 #[inline]
 pub fn be_string(s: &[u8]) -> parser::DataRecordValue {
     parser::DataRecordValue::String(String::from_utf8_lossy(s).to_string())
@@ -80,9 +84,10 @@ fn mpls_stack(s: &[u8]) -> parser::DataRecordValue {
     }
 }
 
-// field_id -> parser
+/// mapping of field_id -> parser
 pub type FieldFormatter = HashMap<u16, (&'static str, fn(&[u8]) -> parser::DataRecordValue)>;
-// enterprise_number -> FieldFormatters
+
+/// mapping of enterprise_number -> FieldFormatters
 pub type EnterpriseFormatter = HashMap<u32, FieldFormatter>;
 
 /// Fieldparser create a map of field parser

@@ -1,8 +1,8 @@
 use nom::{error::make_error, number::complete::be_u8};
 
 use anyhow::{anyhow, Result};
+use formatter;
 use nom_derive::{Nom, Parse};
-use printer;
 use serde::Serialize;
 use state;
 use std::{
@@ -12,7 +12,7 @@ use std::{
 };
 
 pub struct Parser {
-    pen_formatter: printer::EnterpriseFormatter,
+    pen_formatter: formatter::EnterpriseFormatter,
 }
 
 #[allow(dead_code)]
@@ -178,7 +178,7 @@ impl<'a> DataSet<'a> {
     // returning a datarecord key value map
     fn enrich_fields(
         values: &HashMap<u16, (&'a [u8], u32)>,
-        enterprise_parsers: &printer::EnterpriseFormatter,
+        enterprise_parsers: &formatter::EnterpriseFormatter,
     ) -> HashMap<DataRecordKey<'a>, DataRecordValue<'a>> {
         let hs = values
             .iter()
@@ -248,7 +248,7 @@ impl<'a> DataSet<'a> {
         input: &'a [u8],
         length: u16,
         set_id: u16,
-        value_parsers: &printer::EnterpriseFormatter,
+        value_parsers: &formatter::EnterpriseFormatter,
         state: &state::State,
     ) -> nom::IResult<&'a [u8], DataSet<'a>> {
         let mut temp_buf = input;
@@ -401,7 +401,7 @@ impl<'a> Set<'a> {
     // and update the respective data structure with the parsed data.
     fn process_set_body(
         &mut self,
-        fmts: &printer::EnterpriseFormatter,
+        fmts: &formatter::EnterpriseFormatter,
         state: &mut state::State,
     ) -> Result<()> {
         match self.stype {
@@ -440,7 +440,7 @@ impl<'a> Set<'a> {
     // efficient in the type of locks used R/W depending on set content.
     fn process_set_body_async(
         &mut self,
-        fmts: &printer::EnterpriseFormatter,
+        fmts: &formatter::EnterpriseFormatter,
         state: Arc<RwLock<state::State>>,
     ) -> Result<()> {
         match self.stype {
@@ -499,7 +499,7 @@ impl Parser {
     /// create a new parser
     pub fn new() -> Self {
         let mut enterprise_formatters = HashMap::new();
-        enterprise_formatters.insert(0, printer::get_default_parsers());
+        enterprise_formatters.insert(0, formatter::get_default_parsers());
         Self {
             pen_formatter: enterprise_formatters,
         }
