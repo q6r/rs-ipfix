@@ -2,7 +2,7 @@ extern crate nom;
 
 use nom::number::complete::{be_u128, be_u16, be_u32, be_u64};
 use parser;
-use std::collections::HashMap;
+use rustc_hash::FxHashMap as HashMap;
 
 /// conversion of array of bytes to various DataRecordValues
 #[inline]
@@ -95,7 +95,7 @@ pub type EnterpriseFormatter = HashMap<u32, FieldFormatter>;
 macro_rules! field_parser(
     { $($key:expr => ($string:expr, $value:expr)),+ } => {
         {
-        let mut m = FieldFormatter::new();
+        let mut m = FieldFormatter::default();
             $(
                 m.insert($key, ($string, $value));
             )+

@@ -1,5 +1,5 @@
 use parser;
-use std::collections::HashMap;
+use rustc_hash::FxHashMap as HashMap;
 
 #[derive(Debug)]
 pub struct State {
@@ -10,8 +10,8 @@ pub struct State {
 impl State {
     pub fn new() -> Self {
         Self {
-            templates: HashMap::new(),
-            options_templates: HashMap::new(),
+            templates: HashMap::default(),
+            options_templates: HashMap::default(),
         }
     }
 

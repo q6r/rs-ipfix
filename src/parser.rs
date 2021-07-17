@@ -3,10 +3,10 @@ use nom::{error::make_error, number::complete::be_u8};
 use anyhow::{anyhow, Result};
 use formatter;
 use nom_derive::{Nom, Parse};
+use rustc_hash::FxHashMap as HashMap;
 use serde::Serialize;
 use state;
 use std::{
-    collections::HashMap,
     net::{Ipv4Addr, Ipv6Addr},
     sync::{Arc, RwLock},
 };
@@ -234,7 +234,7 @@ impl<'a> DataSet<'a> {
         input: &'a [u8],
         takes: Vec<(u16, u16, u32)>,
     ) -> nom::IResult<&[u8], HashMap<u16, (&'a [u8], u32)>> {
-        let mut values = HashMap::<u16, (&[u8], u32)>::new();
+        let mut values = HashMap::<u16, (&[u8], u32)>::default();
         let mut rest = input;
         for (field_ident, field_size, enterprise_number) in takes {
             let (more, field_buf) = Self::take_field(&rest, field_size)?;
@@ -498,7 +498,7 @@ impl<'a> Set<'a> {
 impl Parser {
     /// create a new parser
     pub fn new() -> Self {
-        let mut enterprise_formatters = HashMap::new();
+        let mut enterprise_formatters = HashMap::default();
         enterprise_formatters.insert(0, formatter::get_default_parsers());
         Self {
             pen_formatter: enterprise_formatters,
@@ -516,7 +516,7 @@ impl Parser {
         let m = self
             .pen_formatter
             .entry(enterprise_number)
-            .or_insert_with(HashMap::new);
+            .or_insert_with(|| HashMap::default());
         m.insert(field_id, (name, parser));
     }
 

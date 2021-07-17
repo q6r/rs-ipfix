@@ -2,6 +2,7 @@
 extern crate nom;
 extern crate anyhow;
 extern crate nom_derive;
+extern crate rustc_hash;
 extern crate serde;
 
 /// implements formatters for various types
