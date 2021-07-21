@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate nom;
 extern crate anyhow;
+#[macro_use]
+extern crate derive_new;
 extern crate nom_derive;
 extern crate rustc_hash;
 extern crate serde;

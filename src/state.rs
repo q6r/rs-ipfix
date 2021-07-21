@@ -1,20 +1,15 @@
 use parser;
 use rustc_hash::FxHashMap as HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, new)]
 pub struct State {
+    #[new(default)]
     templates: HashMap<u16, parser::Template>,
+    #[new(default)]
     options_templates: HashMap<u16, parser::OptionsTemplate>,
 }
 
 impl State {
-    pub fn new() -> Self {
-        Self {
-            templates: HashMap::default(),
-            options_templates: HashMap::default(),
-        }
-    }
-
     pub fn add_template(&mut self, id: u16, template: parser::Template) {
         self.templates.insert(id, template);
     }
@@ -49,5 +44,9 @@ impl State {
 
     pub fn len(&self) -> usize {
         self.templates_len() + self.options_templates_len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }

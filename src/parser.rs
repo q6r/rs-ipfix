@@ -495,6 +495,12 @@ impl<'a> Set<'a> {
     }
 }
 
+impl Default for Parser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Parser {
     /// create a new parser
     pub fn new() -> Self {
@@ -516,14 +522,14 @@ impl Parser {
         let m = self
             .pen_formatter
             .entry(enterprise_number)
-            .or_insert_with(|| HashMap::default());
+            .or_insert_with(HashMap::default);
         m.insert(field_id, (name, parser));
     }
 
     /// similar to `parse_message` except it takes a thread-safe state
     /// can be used for concurrent processing.
     pub fn parse_message_async<'a>(
-        &'a mut self,
+        &'a self,
         state: Arc<RwLock<state::State>>,
         input: &'a [u8],
     ) -> Result<Message> {
@@ -552,7 +558,7 @@ impl Parser {
 
     /// parse an IPFIX message
     pub fn parse_message<'a>(
-        &'a mut self,
+        &'a self,
         state: &mut state::State,
         input: &'a [u8],
     ) -> Result<Message> {
